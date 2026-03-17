@@ -14,16 +14,192 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      chamados: {
+        Row: {
+          conclusao: boolean
+          data_abertura: string
+          data_atualizacao: string
+          data_conclusao: string | null
+          descricao: string | null
+          foto_url: string | null
+          id: string
+          local: string
+          observacoes_adm: string | null
+          responsavel: string | null
+          solicitante_id: string
+          status: Database["public"]["Enums"]["ticket_status"]
+          titulo: string
+          urgencia: Database["public"]["Enums"]["ticket_urgency"]
+        }
+        Insert: {
+          conclusao?: boolean
+          data_abertura?: string
+          data_atualizacao?: string
+          data_conclusao?: string | null
+          descricao?: string | null
+          foto_url?: string | null
+          id?: string
+          local: string
+          observacoes_adm?: string | null
+          responsavel?: string | null
+          solicitante_id: string
+          status?: Database["public"]["Enums"]["ticket_status"]
+          titulo: string
+          urgencia?: Database["public"]["Enums"]["ticket_urgency"]
+        }
+        Update: {
+          conclusao?: boolean
+          data_abertura?: string
+          data_atualizacao?: string
+          data_conclusao?: string | null
+          descricao?: string | null
+          foto_url?: string | null
+          id?: string
+          local?: string
+          observacoes_adm?: string | null
+          responsavel?: string | null
+          solicitante_id?: string
+          status?: Database["public"]["Enums"]["ticket_status"]
+          titulo?: string
+          urgencia?: Database["public"]["Enums"]["ticket_urgency"]
+        }
+        Relationships: []
+      }
+      historico_chamados: {
+        Row: {
+          alteracao: string
+          chamado_id: string
+          created_at: string
+          id: string
+          observacao: string | null
+          user_id: string
+        }
+        Insert: {
+          alteracao: string
+          chamado_id: string
+          created_at?: string
+          id?: string
+          observacao?: string | null
+          user_id: string
+        }
+        Update: {
+          alteracao?: string
+          chamado_id?: string
+          created_at?: string
+          id?: string
+          observacao?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "historico_chamados_chamado_id_fkey"
+            columns: ["chamado_id"]
+            isOneToOne: false
+            referencedRelation: "chamados"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notificacoes: {
+        Row: {
+          chamado_id: string
+          created_at: string
+          destinatario_id: string | null
+          id: string
+          lida: boolean
+          mensagem: string
+          titulo: string
+        }
+        Insert: {
+          chamado_id: string
+          created_at?: string
+          destinatario_id?: string | null
+          id?: string
+          lida?: boolean
+          mensagem: string
+          titulo: string
+        }
+        Update: {
+          chamado_id?: string
+          created_at?: string
+          destinatario_id?: string | null
+          id?: string
+          lida?: boolean
+          mensagem?: string
+          titulo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notificacoes_chamado_id_fkey"
+            columns: ["chamado_id"]
+            isOneToOne: false
+            referencedRelation: "chamados"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "solicitante"
+      ticket_status: "aberto" | "em_andamento" | "aguardando" | "finalizado"
+      ticket_urgency: "baixa" | "media" | "alta" | "critica"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +326,10 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "solicitante"],
+      ticket_status: ["aberto", "em_andamento", "aguardando", "finalizado"],
+      ticket_urgency: ["baixa", "media", "alta", "critica"],
+    },
   },
 } as const
