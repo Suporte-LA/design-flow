@@ -1,0 +1,234 @@
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { Separator } from '@/components/ui/separator';
+import { StatusBadge, UrgencyBadge } from '@/pages/DashboardPage';
+import { toast } from 'sonner';
+import { Loader2 } from 'lucide-react';
+import type { Database } from '@/integrations/supabase/types';
+
+type Chamado = Database['public']['Tables']['chamados']['Row'];
+type Historico = Database['public']['Tables']['historico_chamados']['Row'];
+
+interface TicketDetailDrawerProps {
+  chamado: Chamado | null;
+  open: boolean;
+  onClose: () => void;
+  onUpdate: () => void;
+}
+
+export default function TicketDetailDrawer({ chamado, open, onClose, onUpdate }: TicketDetailDrawerProps) {
+  const { isAdmin, user } = useAuth();
+  const [status, setStatus] = useState('');
+  const [conclusao, setConclusao] = useState(false);
+  const [observacoes, setObservacoes] = useState('');
+  const [responsavel, setResponsavel] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [historico, setHistorico] = useState<Historico[]>([]);
+
+  useEffect(() => {
+    if (chamado) {
+      setStatus(chamado.status);
+      setConclusao(chamado.conclusao);
+      setObservacoes(chamado.observacoes_adm || '');
+      setResponsavel(chamado.responsavel || '');
+      fetchHistorico(chamado.id);
+    }
+  }, [chamado]);
+
+  const fetchHistorico = async (chamadoId: string) => {
+    const { data } = await supabase
+      .from('historico_chamados')
+      .select('*')
+      .eq('chamado_id', chamadoId)
+      .order('created_at', { ascending: false });
+    setHistorico(data || []);
+  };
+
+  const handleSave = async () => {
+    if (!chamado || !user) return;
+
+    // Business rule: can only mark as concluded if status is finalizado
+    if (conclusao && status !== 'finalizado') {
+      toast.error('O chamado só pode ser concluído quando o status for "Finalizado"');
+      return;
+    }
+
+    setSaving(true);
+
+    const updates: Database['public']['Tables']['chamados']['Update'] = {
+      status: status as Chamado['status'],
+      conclusao,
+      observacoes_adm: observacoes || null,
+      responsavel: responsavel || null,
+      data_conclusao: conclusao ? new Date().toISOString() : null,
+    };
+
+    const { error } = await supabase
+      .from('chamados')
+      .update(updates)
+      .eq('id', chamado.id);
+
+    if (error) {
+      toast.error('Erro ao atualizar chamado');
+    } else {
+      // Add history entry
+      const changes: string[] = [];
+      if (status !== chamado.status) changes.push(`Status: ${chamado.status} → ${status}`);
+      if (conclusao !== chamado.conclusao) changes.push(`Conclusão: ${chamado.conclusao ? 'Sim' : 'Não'} → ${conclusao ? 'Sim' : 'Não'}`);
+      if (responsavel !== (chamado.responsavel || '')) changes.push(`Responsável: ${responsavel}`);
+      if (observacoes !== (chamado.observacoes_adm || '')) changes.push('Observações atualizadas');
+
+      if (changes.length > 0) {
+        await supabase.from('historico_chamados').insert({
+          chamado_id: chamado.id,
+          user_id: user.id,
+          alteracao: changes.join('; '),
+          observacao: observacoes || null,
+        });
+      }
+
+      toast.success('Chamado atualizado!');
+      onUpdate();
+    }
+    setSaving(false);
+  };
+
+  if (!chamado) return null;
+
+  return (
+    <Sheet open={open} onOpenChange={(o) => !o && onClose()}>
+      <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
+        <SheetHeader>
+          <SheetTitle className="text-base font-semibold">{chamado.titulo}</SheetTitle>
+        </SheetHeader>
+
+        <div className="mt-4 space-y-5">
+          {/* Info */}
+          <div className="grid grid-cols-2 gap-3 text-sm">
+            <div>
+              <span className="text-muted-foreground text-xs">Local</span>
+              <p className="font-medium text-foreground">{chamado.local}</p>
+            </div>
+            <div>
+              <span className="text-muted-foreground text-xs">Urgência</span>
+              <div className="mt-0.5"><UrgencyBadge urgency={chamado.urgencia} /></div>
+            </div>
+            <div>
+              <span className="text-muted-foreground text-xs">Status</span>
+              <div className="mt-0.5"><StatusBadge status={chamado.status} /></div>
+            </div>
+            <div>
+              <span className="text-muted-foreground text-xs">Abertura</span>
+              <p className="font-medium text-foreground text-xs">
+                {new Date(chamado.data_abertura).toLocaleString('pt-BR')}
+              </p>
+            </div>
+          </div>
+
+          {chamado.descricao && (
+            <div>
+              <span className="text-xs text-muted-foreground">Descrição</span>
+              <p className="text-sm text-foreground mt-1">{chamado.descricao}</p>
+            </div>
+          )}
+
+          {chamado.foto_url && (
+            <div>
+              <span className="text-xs text-muted-foreground">Foto</span>
+              <img src={chamado.foto_url} alt="Foto do chamado" className="mt-1 rounded-md border border-border max-h-48 object-cover" />
+            </div>
+          )}
+
+          {/* Admin controls */}
+          {isAdmin && (
+            <>
+              <Separator />
+              <div className="space-y-3">
+                <h3 className="text-sm font-semibold text-foreground">Ações do Administrador</h3>
+
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Status</Label>
+                  <Select value={status} onValueChange={setStatus}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="aberto">Aberto</SelectItem>
+                      <SelectItem value="em_andamento">Em Andamento</SelectItem>
+                      <SelectItem value="aguardando">Aguardando</SelectItem>
+                      <SelectItem value="finalizado">Finalizado</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Responsável</Label>
+                  <Input
+                    value={responsavel}
+                    onChange={(e) => setResponsavel(e.target.value)}
+                    placeholder="Nome do responsável"
+                    maxLength={100}
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Observações</Label>
+                  <Textarea
+                    value={observacoes}
+                    onChange={(e) => setObservacoes(e.target.value)}
+                    placeholder="Registre o que foi feito..."
+                    rows={3}
+                    maxLength={2000}
+                  />
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Switch
+                    checked={conclusao}
+                    onCheckedChange={setConclusao}
+                    disabled={status !== 'finalizado'}
+                  />
+                  <Label className="text-xs">Marcar como concluído</Label>
+                </div>
+
+                <Button onClick={handleSave} disabled={saving} className="w-full">
+                  {saving && <Loader2 className="animate-spin" />}
+                  Salvar Alterações
+                </Button>
+              </div>
+            </>
+          )}
+
+          {/* History */}
+          {historico.length > 0 && (
+            <>
+              <Separator />
+              <div>
+                <h3 className="text-sm font-semibold text-foreground mb-2">Histórico</h3>
+                <div className="space-y-2">
+                  {historico.map((h) => (
+                    <div key={h.id} className="bg-muted/50 rounded-md p-2.5 text-xs">
+                      <p className="text-foreground font-medium">{h.alteracao}</p>
+                      {h.observacao && <p className="text-muted-foreground mt-1">{h.observacao}</p>}
+                      <p className="text-muted-foreground mt-1">
+                        {new Date(h.created_at).toLocaleString('pt-BR')}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
+}
