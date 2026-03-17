@@ -13,7 +13,12 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ["Inter", "sans-serif"],
+      },
       colors: {
+        surface: "hsl(var(--surface))",
+        "surface-hover": "hsl(var(--surface-hover))",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
