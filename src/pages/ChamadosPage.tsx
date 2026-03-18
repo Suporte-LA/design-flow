@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { StatusBadge, UrgencyBadge } from './DashboardPage';
 import TicketDetailDrawer from '@/components/TicketDetailDrawer';
+import ImageLightbox from '@/components/ImageLightbox';
 import { Search } from 'lucide-react';
 import type { Database } from '@/integrations/supabase/types';
 
