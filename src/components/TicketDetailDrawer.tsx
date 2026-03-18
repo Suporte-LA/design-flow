@@ -135,7 +135,8 @@ export default function TicketDetailDrawer({ chamado, open, onClose, onUpdate }:
               <img
                 src={chamado.foto_url}
                 alt="Foto do chamado"
-                className="rounded-md border border-border w-full max-h-64 object-cover"
+                className="rounded-md border border-border w-full max-h-64 object-cover cursor-pointer hover:opacity-80 transition-opacity"
+                onClick={() => setLightboxOpen(true)}
               />
             </div>
           ) : (
