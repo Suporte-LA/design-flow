@@ -104,6 +104,7 @@ export default function ChamadosPage() {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border bg-muted/50">
+              <th className="text-left p-3 font-medium text-muted-foreground w-12">Foto</th>
               <th className="text-left p-3 font-medium text-muted-foreground">Chamado</th>
               <th className="text-left p-3 font-medium text-muted-foreground hidden sm:table-cell">Local</th>
               <th className="text-left p-3 font-medium text-muted-foreground">Status</th>
