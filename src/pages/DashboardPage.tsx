@@ -117,7 +117,7 @@ export default function DashboardPage() {
               ))}
               {chamados.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="p-6 text-center text-muted-foreground">
+                  <td colSpan={5} className="p-6 text-center text-muted-foreground">
                     Nenhum chamado encontrado
                   </td>
                 </tr>
