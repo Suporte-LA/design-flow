@@ -19,6 +19,7 @@ export default function ChamadosPage() {
   const [statusFilter, setStatusFilter] = useState('todos');
   const [urgenciaFilter, setUrgenciaFilter] = useState('todos');
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
 
   const fetchChamados = async () => {
     let query = supabase.from('chamados').select('*');
