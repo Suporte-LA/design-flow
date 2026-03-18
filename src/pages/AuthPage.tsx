@@ -25,13 +25,15 @@ export default function AuthPage() {
         toast.success('Login realizado com sucesso!');
       }
     } else {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: { data: { full_name: fullName } },
       });
       if (error) {
         toast.error(error.message);
+      } else if (data.session) {
+        toast.success('Conta criada com sucesso!');
       } else {
         toast.success('Conta criada! Verifique seu e-mail.');
       }
