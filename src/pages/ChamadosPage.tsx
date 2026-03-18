@@ -167,6 +167,8 @@ export default function ChamadosPage() {
         onClose={() => setSelectedId(null)}
         onUpdate={fetchChamados}
       />
+
+      <ImageLightbox src={lightboxUrl} open={!!lightboxUrl} onClose={() => setLightboxUrl(null)} />
     </div>
   );
 }
