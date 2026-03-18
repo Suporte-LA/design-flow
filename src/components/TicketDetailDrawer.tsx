@@ -119,7 +119,8 @@ export default function TicketDetailDrawer({ chamado, open, onClose, onUpdate }:
   if (!chamado) return null;
 
   return (
-    <Sheet open={open} onOpenChange={(o) => !o && onClose()}>
+    <>
+      <Sheet open={open} onOpenChange={(o) => !o && onClose()}>
       <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
         <SheetHeader>
           <SheetTitle className="text-base font-semibold">{chamado.titulo}</SheetTitle>
