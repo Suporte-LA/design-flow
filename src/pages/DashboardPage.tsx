@@ -102,7 +102,12 @@ export default function DashboardPage() {
                 <tr key={chamado.id} className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors">
                   <td className="p-3">
                     {chamado.foto_url ? (
-                      <img src={chamado.foto_url} alt="" className="h-10 w-10 rounded object-cover border border-border" />
+                      <img
+                        src={chamado.foto_url}
+                        alt=""
+                        className="h-10 w-10 rounded object-cover border border-border cursor-pointer hover:opacity-80 transition-opacity"
+                        onClick={() => setLightboxUrl(chamado.foto_url)}
+                      />
                     ) : (
                       <div className="h-10 w-10 rounded bg-muted flex items-center justify-center text-muted-foreground text-xs">—</div>
                     )}
