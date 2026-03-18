@@ -11,6 +11,7 @@ type Chamado = Database['public']['Tables']['chamados']['Row'];
 export default function DashboardPage() {
   const { isAdmin, user } = useAuth();
   const [chamados, setChamados] = useState<Chamado[]>([]);
+  const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
