@@ -282,5 +282,8 @@ export default function TicketDetailDrawer({ chamado, open, onClose, onUpdate }:
         </div>
       </SheetContent>
     </Sheet>
+
+    <ImageLightbox src={chamado.foto_url} open={lightboxOpen} onClose={() => setLightboxOpen(false)} />
+    </>
   );
 }
