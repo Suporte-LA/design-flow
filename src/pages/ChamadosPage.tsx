@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { StatusBadge, UrgencyBadge } from './DashboardPage';
 import TicketDetailDrawer from '@/components/TicketDetailDrawer';
+import ImageLightbox from '@/components/ImageLightbox';
 import { Search } from 'lucide-react';
 import type { Database } from '@/integrations/supabase/types';
 
@@ -18,6 +19,7 @@ export default function ChamadosPage() {
   const [statusFilter, setStatusFilter] = useState('todos');
   const [urgenciaFilter, setUrgenciaFilter] = useState('todos');
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
 
   const fetchChamados = async () => {
     let query = supabase.from('chamados').select('*');
@@ -120,9 +122,14 @@ export default function ChamadosPage() {
                 onClick={() => setSelectedId(chamado.id)}
                 className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors cursor-pointer"
               >
-                <td className="p-3">
+                <td className="p-3" onClick={(e) => e.stopPropagation()}>
                   {chamado.foto_url ? (
-                    <img src={chamado.foto_url} alt="" className="h-10 w-10 rounded object-cover border border-border" />
+                    <img
+                      src={chamado.foto_url}
+                      alt=""
+                      className="h-10 w-10 rounded object-cover border border-border cursor-pointer hover:opacity-80 transition-opacity"
+                      onClick={() => setLightboxUrl(chamado.foto_url)}
+                    />
                   ) : (
                     <div className="h-10 w-10 rounded bg-muted flex items-center justify-center text-muted-foreground text-xs">—</div>
                   )}
@@ -160,6 +167,8 @@ export default function ChamadosPage() {
         onClose={() => setSelectedId(null)}
         onUpdate={fetchChamados}
       />
+
+      <ImageLightbox src={lightboxUrl} open={!!lightboxUrl} onClose={() => setLightboxUrl(null)} />
     </div>
   );
 }

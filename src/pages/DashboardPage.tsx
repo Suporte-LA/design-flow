@@ -3,6 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
 import { LayoutDashboard, Clock, CheckCircle2, AlertTriangle } from 'lucide-react';
+import ImageLightbox from '@/components/ImageLightbox';
 import type { Database } from '@/integrations/supabase/types';
 
 type Chamado = Database['public']['Tables']['chamados']['Row'];
@@ -10,6 +11,7 @@ type Chamado = Database['public']['Tables']['chamados']['Row'];
 export default function DashboardPage() {
   const { isAdmin, user } = useAuth();
   const [chamados, setChamados] = useState<Chamado[]>([]);
+  const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -100,7 +102,12 @@ export default function DashboardPage() {
                 <tr key={chamado.id} className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors">
                   <td className="p-3">
                     {chamado.foto_url ? (
-                      <img src={chamado.foto_url} alt="" className="h-10 w-10 rounded object-cover border border-border" />
+                      <img
+                        src={chamado.foto_url}
+                        alt=""
+                        className="h-10 w-10 rounded object-cover border border-border cursor-pointer hover:opacity-80 transition-opacity"
+                        onClick={() => setLightboxUrl(chamado.foto_url)}
+                      />
                     ) : (
                       <div className="h-10 w-10 rounded bg-muted flex items-center justify-center text-muted-foreground text-xs">—</div>
                     )}
@@ -126,6 +133,8 @@ export default function DashboardPage() {
           </table>
         </div>
       </div>
+
+      <ImageLightbox src={lightboxUrl} open={!!lightboxUrl} onClose={() => setLightboxUrl(null)} />
     </div>
   );
 }

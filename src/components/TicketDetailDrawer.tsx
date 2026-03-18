@@ -12,6 +12,7 @@ import { Separator } from '@/components/ui/separator';
 import { StatusBadge, UrgencyBadge } from '@/pages/DashboardPage';
 import { toast } from 'sonner';
 import { Loader2, Clock, ArrowRight, ImageIcon } from 'lucide-react';
+import ImageLightbox from '@/components/ImageLightbox';
 import type { Database } from '@/integrations/supabase/types';
 
 type Chamado = Database['public']['Tables']['chamados']['Row'];
@@ -39,6 +40,7 @@ export default function TicketDetailDrawer({ chamado, open, onClose, onUpdate }:
   const [responsavel, setResponsavel] = useState('');
   const [saving, setSaving] = useState(false);
   const [historico, setHistorico] = useState<Historico[]>([]);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   useEffect(() => {
     if (chamado) {
@@ -117,7 +119,8 @@ export default function TicketDetailDrawer({ chamado, open, onClose, onUpdate }:
   if (!chamado) return null;
 
   return (
-    <Sheet open={open} onOpenChange={(o) => !o && onClose()}>
+    <>
+      <Sheet open={open} onOpenChange={(o) => !o && onClose()}>
       <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
         <SheetHeader>
           <SheetTitle className="text-base font-semibold">{chamado.titulo}</SheetTitle>
@@ -133,7 +136,8 @@ export default function TicketDetailDrawer({ chamado, open, onClose, onUpdate }:
               <img
                 src={chamado.foto_url}
                 alt="Foto do chamado"
-                className="rounded-md border border-border w-full max-h-64 object-cover"
+                className="rounded-md border border-border w-full max-h-64 object-cover cursor-pointer hover:opacity-80 transition-opacity"
+                onClick={() => setLightboxOpen(true)}
               />
             </div>
           ) : (
@@ -279,5 +283,8 @@ export default function TicketDetailDrawer({ chamado, open, onClose, onUpdate }:
         </div>
       </SheetContent>
     </Sheet>
+
+    <ImageLightbox src={chamado.foto_url} open={lightboxOpen} onClose={() => setLightboxOpen(false)} />
+    </>
   );
 }
