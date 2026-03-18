@@ -40,6 +40,7 @@ export default function TicketDetailDrawer({ chamado, open, onClose, onUpdate }:
   const [responsavel, setResponsavel] = useState('');
   const [saving, setSaving] = useState(false);
   const [historico, setHistorico] = useState<Historico[]>([]);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   useEffect(() => {
     if (chamado) {
