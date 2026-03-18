@@ -88,6 +88,7 @@ export default function DashboardPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border bg-muted/50">
+                <th className="text-left p-3 font-medium text-muted-foreground w-12">Foto</th>
                 <th className="text-left p-3 font-medium text-muted-foreground">Chamado</th>
                 <th className="text-left p-3 font-medium text-muted-foreground hidden sm:table-cell">Local</th>
                 <th className="text-left p-3 font-medium text-muted-foreground">Status</th>
@@ -97,6 +98,13 @@ export default function DashboardPage() {
             <tbody>
               {chamados.slice(0, 10).map((chamado) => (
                 <tr key={chamado.id} className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors">
+                  <td className="p-3">
+                    {chamado.foto_url ? (
+                      <img src={chamado.foto_url} alt="" className="h-10 w-10 rounded object-cover border border-border" />
+                    ) : (
+                      <div className="h-10 w-10 rounded bg-muted flex items-center justify-center text-muted-foreground text-xs">—</div>
+                    )}
+                  </td>
                   <td className="p-3 text-foreground font-medium">{chamado.titulo}</td>
                   <td className="p-3 text-muted-foreground hidden sm:table-cell">{chamado.local}</td>
                   <td className="p-3">
