@@ -12,6 +12,7 @@ import { Separator } from '@/components/ui/separator';
 import { StatusBadge, UrgencyBadge } from '@/pages/DashboardPage';
 import { toast } from 'sonner';
 import { Loader2, Clock, ArrowRight, ImageIcon } from 'lucide-react';
+import ImageLightbox from '@/components/ImageLightbox';
 import type { Database } from '@/integrations/supabase/types';
 
 type Chamado = Database['public']['Tables']['chamados']['Row'];
