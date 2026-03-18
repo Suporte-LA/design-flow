@@ -3,6 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
 import { LayoutDashboard, Clock, CheckCircle2, AlertTriangle } from 'lucide-react';
+import ImageLightbox from '@/components/ImageLightbox';
 import type { Database } from '@/integrations/supabase/types';
 
 type Chamado = Database['public']['Tables']['chamados']['Row'];
