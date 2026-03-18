@@ -133,6 +133,8 @@ export default function DashboardPage() {
           </table>
         </div>
       </div>
+
+      <ImageLightbox src={lightboxUrl} open={!!lightboxUrl} onClose={() => setLightboxUrl(null)} />
     </div>
   );
 }
