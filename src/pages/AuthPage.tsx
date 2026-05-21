@@ -8,6 +8,7 @@ import { Loader2 } from 'lucide-react';
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
+  const [isForgot, setIsForgot] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
@@ -17,7 +18,18 @@ export default function AuthPage() {
     e.preventDefault();
     setLoading(true);
 
-    if (isLogin) {
+    if (isForgot) {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) {
+        toast.error(error.message);
+      } else {
+        toast.success('Enviamos um link de redefinição para seu e-mail.');
+        setIsForgot(false);
+        setIsLogin(true);
+      }
+    } else if (isLogin) {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
         toast.error(error.message);
@@ -28,7 +40,10 @@ export default function AuthPage() {
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
-        options: { data: { full_name: fullName } },
+        options: {
+          data: { full_name: fullName },
+          emailRedirectTo: `${window.location.origin}/`,
+        },
       });
       if (error) {
         toast.error(error.message);
@@ -48,12 +63,16 @@ export default function AuthPage() {
           <div className="text-center space-y-1">
             <h1 className="text-xl font-semibold text-foreground">Design Ops</h1>
             <p className="text-sm text-muted-foreground">
-              {isLogin ? 'Faça login para continuar' : 'Crie sua conta'}
+              {isForgot
+                ? 'Informe seu e-mail para redefinir a senha'
+                : isLogin
+                ? 'Faça login para continuar'
+                : 'Crie sua conta'}
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {!isLogin && (
+            {!isLogin && !isForgot && (
               <div className="space-y-1.5">
                 <Label htmlFor="fullName">Nome completo</Label>
                 <Input
@@ -76,32 +95,55 @@ export default function AuthPage() {
                 placeholder="seu@email.com"
               />
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="password">Senha</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={6}
-                placeholder="••••••••"
-              />
-            </div>
+            {!isForgot && (
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password">Senha</Label>
+                  {isLogin && (
+                    <button
+                      type="button"
+                      onClick={() => setIsForgot(true)}
+                      className="text-xs text-primary hover:underline"
+                    >
+                      Esqueci a senha
+                    </button>
+                  )}
+                </div>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={6}
+                  placeholder="••••••••"
+                />
+              </div>
+            )}
             <Button type="submit" className="w-full" disabled={loading}>
               {loading && <Loader2 className="animate-spin" />}
-              {isLogin ? 'Entrar' : 'Criar conta'}
+              {isForgot ? 'Enviar link de redefinição' : isLogin ? 'Entrar' : 'Criar conta'}
             </Button>
           </form>
 
           <div className="text-center">
-            <button
-              type="button"
-              onClick={() => setIsLogin(!isLogin)}
-              className="text-sm text-primary hover:underline"
-            >
-              {isLogin ? 'Não tem conta? Cadastre-se' : 'Já tem conta? Faça login'}
-            </button>
+            {isForgot ? (
+              <button
+                type="button"
+                onClick={() => setIsForgot(false)}
+                className="text-sm text-primary hover:underline"
+              >
+                Voltar para o login
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setIsLogin(!isLogin)}
+                className="text-sm text-primary hover:underline"
+              >
+                {isLogin ? 'Não tem conta? Cadastre-se' : 'Já tem conta? Faça login'}
+              </button>
+            )}
           </div>
         </div>
       </div>
