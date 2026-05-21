@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import AuthPage from "./pages/AuthPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 import DashboardPage from "./pages/DashboardPage";
 import NovoChamadoPage from "./pages/NovoChamadoPage";
 import ChamadosPage from "./pages/ChamadosPage";
@@ -43,6 +44,7 @@ const App = () => (
         <AuthProvider>
           <Routes>
             <Route path="/login" element={<AuthRoute />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
             <Route path="/novo-chamado" element={<ProtectedRoute><NovoChamadoPage /></ProtectedRoute>} />
             <Route path="/chamados" element={<ProtectedRoute><ChamadosPage /></ProtectedRoute>} />
